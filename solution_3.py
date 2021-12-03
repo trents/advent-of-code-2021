@@ -1,7 +1,10 @@
 ''' Advent of Code 2021 Day 3 solution '''
 
-def co2_scrubber_rating(values,place=0):
-    """ Generates a C02 scrubber rating as a binary string, recursively """
+def survival_rating(values,scrub_type,place=0):
+    """ Generates a survival rating as a binary string, recursively.
+        values is a list of binary values
+        scrub_type is 0 if CO2 scrubber, 1 if oxygen scrubber
+        place is the binary place to consider in each element of values """
 
     zero_count = 0
     one_count = 0
@@ -12,38 +15,14 @@ def co2_scrubber_rating(values,place=0):
         else:
             one_count += 1
 
-    master_bit = "0"
-    if one_count < zero_count:
-        master_bit = "1"
-
-    new_values = []
-
-    for item in values:
-        if item[place] == master_bit:
-            new_values.append(item)
-
-    if len(new_values) == 1:
-        return_value = new_values[0]
-    else:
-        return_value = co2_scrubber_rating(new_values,place+1)
-
-    return return_value
-
-def oxygen_generator_rating(values,place=0):
-    """ Generates an oxygen generator rating as a binary string, recursively """
-
-    zero_count = 0
-    one_count = 0
-
-    for item in values:
-        if item[place] == "0":
-            zero_count += 1
-        else:
-            one_count += 1
-
-    master_bit = "1"
-    if one_count < zero_count:
+    if scrub_type == 0:
         master_bit = "0"
+        if one_count < zero_count:
+            master_bit = "1"
+    else:
+        master_bit = "1"
+        if one_count < zero_count:
+            master_bit = "0"
 
     new_values = []
 
@@ -54,7 +33,7 @@ def oxygen_generator_rating(values,place=0):
     if len(new_values) == 1:
         return_value = new_values[0]
     else:
-        return_value = oxygen_generator_rating(new_values,place+1)
+        return_value = survival_rating(new_values,scrub_type,place+1)
 
     return return_value
 
@@ -86,8 +65,8 @@ def main():
 
     print("3a -> ",gamma_int * epsilon_int)
 
-    co2_rating_int = int(co2_scrubber_rating(lines),2)
-    oxygen_rating_int = int(oxygen_generator_rating(lines),2)
+    co2_rating_int = int(survival_rating(lines,0),2)
+    oxygen_rating_int = int(survival_rating(lines,1),2)
 
     print("3b -> ",co2_rating_int * oxygen_rating_int)
 
