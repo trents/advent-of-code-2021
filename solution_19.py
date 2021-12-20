@@ -1,6 +1,5 @@
 ''' Advent of Code 2021 Day 19 solution 
-    Big props to several Redditors for help on this mess 
-
+    Big props to several Redditors for help on this mess, esp. p88h
 '''
 
 import itertools
