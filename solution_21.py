@@ -71,61 +71,59 @@ def main():
 
     print("21a -> ",count)
 
-    turn_pos_1 = []
-    turn_pos_2 = []
-
     # initialize turn_pos
 
+    turn_pos = [[[[[0 for p1pos in range(10)] for p2pos in range(10)] for p1score in range(21)] for p2score in range(21)] for turn in range(19)]
+
     scoring_dict = {3: 1, 4: 3, 5: 6, 6: 7, 7: 6, 8: 3, 9: 1}
+    
+    turn_pos[0][0][0][p1start][p2start] = 1
 
-    for i in range(3,10):
-        p1score = p1start + i
-        if p1score > 10: p1score -= 10
-        turn_pos_1.append((p1start + i, p1score, scoring_dict[i]))
-        p2score = p2start + i
-        if p2score > 10: p2score -= 10
-        turn_pos_2.append((p2start + i, p2score, scoring_dict[i]))
+    p1_victories = 0
+    p2_victories = 0
 
-    p1victories = 0
-    p2victories = 0
+    for count_turn, turn in enumerate(turn_pos):
+       for count_p1score, p1score in enumerate(turn):
+           for count_p2score, p2score in enumerate(p1score):
+               for count_p1pos, p1pos in enumerate(p2score):
+                   for count_p2pos, p2pos in enumerate(p1pos):
+                       if p2pos > 0:
+                           for i in range(3,10):
+                               new_p1score = count_p1score
+                               new_p2score = count_p2score
+                               new_p1pos = count_p1pos
+                               new_p2pos = count_p2pos
+                               game_total = p2pos
+                               if count_turn % 2 == 0:
+                                   new_p1pos += i
+                                   if new_p1pos > 10:
+                                      new_p1pos = new_p1pos % 10
+                                      new_p1score += new_p1pos
+                                   elif new_p1pos == 10:
+                                      new_p1score += 10
+                                      new_p1pos = new_p1pos % 10
+                                   else:
+                                      new_p1score += new_p1pos
+                                   if new_p1score > 20:
+                                       p1_victories += game_total * scoring_dict[i]
+                                   else:
+                                       turn_pos[count_turn+1][new_p1score][new_p2score][new_p1pos][new_p2pos] += game_total * scoring_dict[i]
+                               else:
+                                   new_p2pos += i
+                                   if new_p2pos > 10:
+                                      new_p2pos = new_p2pos % 10
+                                      new_p2score += new_p2pos
+                                   elif new_p2pos == 10:
+                                      new_p2score += 10
+                                      new_p2pos = new_p2pos % 10
+                                   else:
+                                      new_p2score += new_p2pos
+                                   if new_p2score > 20:
+                                       p2_victories += game_total * scoring_dict[i]
+                                   else:
+                                       turn_pos[count_turn+1][new_p1score][new_p2score][new_p1pos][new_p2pos] += game_total * scoring_dict[i]
+ 
 
-    # iterate through the turns, counting victories for each side
-
-    while len(turn_pos_1) + len(turn_pos_2) > 0:
-        score1 = turn_pos_1.pop()
-        for i in range(3,10):
-            p1score = score1[1]
-            p1pos = score1[0] + i
-            if p1pos > 10: p1pos -= 10
-            p1score += p1pos
-            turn_pos_1.append((p1pos, p1score, scoring_dict[i] * score1[2]))
-        winners = count_winnings(turn_pos_1)
-        losers = count_losings(turn_pos_2)
-        p1victories += winners * losers
-        for count, _ in enumerate(score1):
-            if turn_pos_1[count][1] > 20:
-                del turn_pos_1[count]
-
-        score2 = turn_pos_2.pop()
-        for i in range(3,10):
-            p2score = score2[1]
-            p2pos = score2[0] + i
-            if p2pos > 10: p2pos -= 10
-            p2score += p2pos
-            turn_pos_2.append((p2pos, p2score, scoring_dict[i] * score2[2]))
-        winners = count_winnings(turn_pos_2)
-        losers = count_losings(turn_pos_1)
-        p2victories += winners * losers
-        for count, _ in enumerate(score2):
-            if turn_pos_2[count][1] > 20:
-                del turn_pos_2[count]
-
-    # There is a much faster dynamic way to do this, which I realized as this was running
-    # Make a list of positions and scores for both players, on the order of 40K in size
-    # Calculate totals for each, add up the victories
-    # I could have probably written that version in the time that it took this version to run
-
-    print("21b -> ",p1victories)
-
+    print("21b -> ",max(p1_victories,p2_victories))
 if __name__ == "__main__":
     main()
